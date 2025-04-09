@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flor do Tempo</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+    body {
+      font-family: 'Pacifico', cursive;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(270deg, #ffe4ec, #f3d6ff, #e2f0ff);
+      background-size: 600% 600%;
+      animation: gradientShift 20s ease infinite;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    header {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      color: #d36ba3;
+      text-shadow: 1px 1px 4px #fff;
+    }
+
+    .flower-stage {
+      width: 180px;
+      height: 180px;
+      margin-bottom: 20px;
+      animation: sway 4s ease-in-out infinite;
+    }
+
+    @keyframes sway {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(2deg); }
+      50% { transform: rotate(0deg); }
+      75% { transform: rotate(-2deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    .caption {
+      font-size: 20px;
+      color: #6e4e5e;
+      text-shadow: 1px 1px 3px #fff;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .heart {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: #ff69b4;
+      transform: rotate(45deg);
+      animation: fall 6s linear infinite;
+      opacity: 0.6;
+    }
+
+    .heart::before,
+    .heart::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: #ff69b4;
+      border-radius: 50%;
+    }
+
+    .heart::before {
+      top: -10px;
+      left: 0;
+    }
+
+    .heart::after {
+      left: -10px;
+      top: 0;
+    }
+
+    @keyframes fall {
+      0% {
+        top: -10%;
+        left: calc(100% * var(--x));
+        transform: translateX(0) rotate(45deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.5;
+      }
+      100% {
+        top: 110%;
+        left: calc(100% * var(--x) + 50px);
+        transform: translateX(30px) rotate(45deg);
+        opacity: 0;
+      }
+    }
+
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #fff0f5;
+      padding: 20px;
+      border: 2px solid #d36ba3;
+      border-radius: 16px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      z-index: 10;
+      max-width: 300px;
+    }
+
+    .popup img {
+      max-width: 100%;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+
+    .popup-close {
+      margin-top: 10px;
+      background: #d36ba3;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+
+    .letter-btn {
+      position: absolute;
+      top: 130px;
+      left: 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 64px;
+      color: #d36ba3;
+      z-index: 5;
+    }
+  </style>
+</head>
+<body>
+  <header>CrowLuna</header>
+  <button class="letter-btn" onclick="togglePopup()">💌</button>
+  <div id="flower" class="flower-stage"></div>
+  <div class="caption" id="timer"></div>
+
+  <div id="popup" class="popup">
+    <img src="https://pbs.twimg.com/media/GoEUisiXQAA1IOF?format=jpg&name=large">
+    <p>Desde o primeiro dia, meu coração floresce só por estar ao seu lado. Te amo infinitamente 💖</p>
+    <button class="popup-close" onclick="togglePopup()">Fechar</button>
+  </div>
+
+  <script>
+    const startDate = new Date('2024-12-27T00:00:00');
+    const flowerContainer = document.getElementById('flower');
+    const timer = document.getElementById('timer');
+
+    function updateClock() {
+      const now = new Date();
+      let diff = now - startDate;
+
+      const seconds = Math.floor(diff / 1000) % 60;
+      const minutes = Math.floor(diff / 1000 / 60) % 60;
+      const hours = Math.floor(diff / 1000 / 60 / 60) % 24;
+      const days = Math.floor(diff / 1000 / 60 / 60 / 24);
+      const months = Math.floor(days / 30.4375);
+      const years = Math.floor(months / 12);
+
+      const remMonths = months % 12;
+      const remDays = Math.floor(days % 30.4375);
+
+      timer.textContent = `Tempo juntos: ${years} ano(s), ${remMonths} mês(es), ${remDays} dia(s), ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    function updateFlower() {
+      const today = new Date();
+      const diffTime = today - startDate;
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+      const parser = new DOMParser();
+      let svgText = '';
+
+      if (diffDays < 30) {
+        svgText = `
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="32" cy="50" r="6" fill="#7b3f00" />
+            <rect x="0" y="56" width="64" height="8" fill="#a0522d" />
+          </svg>`;
+      } else if (diffDays < 90) {
+        svgText = `
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="56" width="64" height="8" fill="#a0522d" />
+            <line x1="32" y1="50" x2="32" y2="20" stroke="#228B22" stroke-width="4" />
+            <ellipse cx="26" cy="30" rx="6" ry="12" fill="#32cd32" />
+            <ellipse cx="38" cy="30" rx="6" ry="12" fill="#32cd32" />
+          </svg>`;
+      } else if (diffDays < 180) {
+        svgText = `
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="56" width="64" height="8" fill="#a0522d" />
+            <line x1="32" y1="56" x2="32" y2="20" stroke="#228B22" stroke-width="4" />
+            <circle cx="32" cy="18" r="8" fill="#ffd700" />
+            <ellipse cx="26" cy="24" rx="6" ry="12" fill="#32cd32" />
+            <ellipse cx="38" cy="24" rx="6" ry="12" fill="#32cd32" />
+          </svg>`;
+      } else {
+        svgText = `
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="56" width="64" height="8" fill="#a0522d" />
+            <line x1="32" y1="56" x2="32" y2="20" stroke="#228B22" stroke-width="4" />
+            <circle cx="32" cy="20" r="8" fill="#ffd700" />
+            <circle cx="24" cy="20" r="6" fill="#ff69b4" />
+            <circle cx="40" cy="20" r="6" fill="#ff69b4" />
+            <circle cx="32" cy="12" r="6" fill="#ff69b4" />
+            <circle cx="32" cy="28" r="6" fill="#ff69b4" />
+          </svg>`;
+      }
+
+      const svgDoc = parser.parseFromString(svgText, "image/svg+xml").documentElement;
+      flowerContainer.replaceChildren(svgDoc);
+    }
+
+    function togglePopup() {
+      const popup = document.getElementById('popup');
+      popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+    }
+
+    updateFlower();
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    for (let i = 0; i < 30; i++) {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.style.setProperty('--x', Math.random());
+      heart.style.animationDelay = `${Math.random() * 5}s`;
+      document.body.appendChild(heart);
+    }
+  </script>
+</body>
+</html>
